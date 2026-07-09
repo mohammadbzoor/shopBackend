@@ -1,0 +1,45 @@
+{
+  "name": "Backend",
+  "version": "1.0.0",
+  "description": "A simple Express application",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "nodemon server.js",
+    "start:prod": "NODE_ENV=production node server.js"
+  },
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "color": "^5.0.3",
+    "colors": "^1.4.0",
+    "compression": "^1.8.1",
+    "cors": "^2.8.6",
+    "cros": "^1.1.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-async-handler": "^1.2.0",
+    "express-validator": "^7.3.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.7.0",
+    "morgan": "^1.11.0",
+    "multer": "^2.2.0",
+    "nodemailer": "^9.0.1",
+    "sharp": "^0.35.2",
+    "slugify": "^1.6.9",
+    "stripe": "^22.3.0",
+    "uuid": "^14.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.5.6",
+    "eslint-plugin-react": "^7.37.5",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.8.4"
+  }
+}
