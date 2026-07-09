@@ -12,13 +12,17 @@ const {
     findSpecifcOrder,
     updateOrderDeli,
     updateOrderToPaid,
-    checkoutSession
+    checkoutSession,
+    webhookCheckout
 
 } = require('../services/orderServices');
 
 const authService= require("../services/authService")
 
 const router = express.Router();
+
+// Webhook route (no auth needed, must be before protect middleware)
+router.post('/webhook-checkout', express.raw({type: 'application/json'}), webhookCheckout);
 
 router.use(authService.protect)
 
