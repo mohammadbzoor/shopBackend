@@ -250,41 +250,33 @@ cancel_url: `${req.protocol}://${req.get('host')}/api/v1/cart`,
 });
 
 
-exports.webhookCheckout = async (req, res) => {
+exports.webhookCheckout = asyncHandler(async (req, res, next) => {
   console.log('WEBHOOK ARRIVED');
 
-  return res.status(200).json({
-    received: true,
-  });
-};
+  const sig = req.headers['stripe-signature'];
 
-// exports.webhookCheckout = asyncHandler(async (req, res, next) => {
-//   console.log('WEBHOOK ARRIVED');
+  let event;
 
-//   const sig = req.headers['stripe-signature'];
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    console.log(`Webhook Error: ${err.message}`);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
 
-//   let event;
+  if (event.type === 'checkout.session.completed') {
+    console.log('Create Order Here............');
 
-//   try {
-//     event = stripe.webhooks.constructEvent(
-//       req.body,
-//       sig,
-//       process.env.STRIPE_WEBHOOK_SECRET
-//     );
-//   } catch (err) {
-//     console.log(`Webhook Error: ${err.message}`);
-//     return res.status(400).send(`Webhook Error: ${err.message}`);
-//   }
+    const session = event.data.object;
 
-//   if (event.type === 'checkout.session.completed') {
-//     console.log('Create Order Here............');
+    console.log('Session ID:', session.id);
+    console.log('Cart ID:', session.client_reference_id);
+    console.log('Customer Email:', session.customer_email);
+  }
 
-//     const session = event.data.object;
-
-//     console.log('Session ID:', session.id);
-//     console.log('Cart ID:', session.client_reference_id);
-//     console.log('Customer Email:', session.customer_email);
-//   }
-
-//   res.status(200).json({ received: true });
-// });
+  res.status(200).json({ received: true });
+});
