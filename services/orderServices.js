@@ -249,33 +249,42 @@ cancel_url: `${req.protocol}://${req.get('host')}/api/v1/cart`,
   });
 });
 
-exports.webhookCheckout = asyncHandler(async (req, res, next) => {
+
+exports.webhookCheckout = async (req, res) => {
   console.log('WEBHOOK ARRIVED');
 
-  const sig = req.headers['stripe-signature'];
+  return res.status(200).json({
+    received: true,
+  });
+};
 
-  let event;
+// exports.webhookCheckout = asyncHandler(async (req, res, next) => {
+//   console.log('WEBHOOK ARRIVED');
 
-  try {
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
-  } catch (err) {
-    console.log(`Webhook Error: ${err.message}`);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
+//   const sig = req.headers['stripe-signature'];
 
-  if (event.type === 'checkout.session.completed') {
-    console.log('Create Order Here............');
+//   let event;
 
-    const session = event.data.object;
+//   try {
+//     event = stripe.webhooks.constructEvent(
+//       req.body,
+//       sig,
+//       process.env.STRIPE_WEBHOOK_SECRET
+//     );
+//   } catch (err) {
+//     console.log(`Webhook Error: ${err.message}`);
+//     return res.status(400).send(`Webhook Error: ${err.message}`);
+//   }
 
-    console.log('Session ID:', session.id);
-    console.log('Cart ID:', session.client_reference_id);
-    console.log('Customer Email:', session.customer_email);
-  }
+//   if (event.type === 'checkout.session.completed') {
+//     console.log('Create Order Here............');
 
-  res.status(200).json({ received: true });
-});
+//     const session = event.data.object;
+
+//     console.log('Session ID:', session.id);
+//     console.log('Cart ID:', session.client_reference_id);
+//     console.log('Customer Email:', session.customer_email);
+//   }
+
+//   res.status(200).json({ received: true });
+// });
