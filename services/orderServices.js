@@ -249,90 +249,16 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
 
 exports.webhookCheckout=asyncHandler(async (req, res, next)=>{
   const sig=req.headers['stripe-signature'];
-  
-  console.log('🔔 Webhook received');
 
   let event;
 
   try{
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
-    console.log('✅ Event verified:', event.type);
+    event = stripe.webhooks.constructEvent(req,res,sig,process.env.STRIPE_WEBHOOK_SECRET);
   }catch(err){
-    console.error('❌ Webhook Error:', err.message);
     return res.status(400).send(`Webhook Error : ${err.message}`);
   }
 
   if(event.type ==='checkout.session.completed'){
-    console.log('🎉 Payment completed! Creating order...');
-    // Get the session
-    const session = event.data.object;
-    const cartId = session.client_reference_id;
-    const customer_email = session.customer_email;
-
-    // Get cart
-    const cart = await CartModel.findById(cartId);
-    if(!cart){
-      console.error('❌ Cart not found:', cartId);
-      return res.status(400).json({ status: 'fail', message: 'Cart not found' });
-    }
-
-    // Get user
-    const UserModel = require('../models/userModle');
-    const user = await UserModel.findOne({ email: customer_email });
-    if(!user){
-      console.error('❌ User not found:', customer_email);
-      return res.status(400).json({ status: 'fail', message: 'User not found' });
-    }
-
-    // Calculate prices
-    const taxPrice = 0;
-    const shippingPrice = 0;
-    const cartPrice = cart.totalPriceAfterDiscount 
-      ? cart.totalPriceAfterDiscount
-      : cart.totalCartPrice;
-    const totalOrderPrice = cartPrice + taxPrice + shippingPrice;
-
-    // Create order
-    const order = await OrderModel.create({
-      user: user._id,
-      cartItems: cart.cartItems,
-      shippingAddress: {
-        details: session.metadata.details,
-        phone: session.metadata.phone,
-        city: session.metadata.city,
-        postalcode: session.metadata.postalcode,
-      },
-      totalOrderPrice,
-      isPaid: true,
-      paidAt: Date.now(),
-      paymentMethodType: 'card',
-    });
-
-    // Update product quantities and sold count
-    if(order){
-      const bulkOption = cart.cartItems.map((item)=>({
-        updateOne:{
-          filter:{_id: item.product},
-          update:{
-            $inc:{
-              quantity: -item.quantity,
-              sold: +item.quantity
-            },
-          }
-        },
-      }));
-      await productModel.bulkWrite(bulkOption, {});
-
-      // Clear cart
-      await CartModel.findByIdAndDelete(cartId);
-    }
-
-    console.log('✅ Order created successfully:', order._id);
+    console.log('Create Order Here............')
   }
-
-  res.status(200).json({ status: 'success' });
 })
