@@ -32,7 +32,7 @@ app.use(compression())
 
 //Checkout webhoock
 
-app.post('wechook-checkout',express.raw({type:'application/json'}),webhookCheckout)
+app.post('/wechook-checkout',express.raw({type:'application/json'}),webhookCheckout)
 
 // Middleware
 app.use(express.json()); // Parse JSON request bodies
