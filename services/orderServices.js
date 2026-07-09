@@ -8,6 +8,7 @@ const OrderModel = require('../models/orderModel');
 const CartModel = require('../models/cartModel');
 const productModel = require('../models/productModel');
 const cartModel = require('../models/cartModel');
+const { strip } = require('colors');
 // @desc create cash order 
 // route POST /api/v1/orders/cartId
 // Protected/User
@@ -245,3 +246,19 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
     session,
   });
 });
+
+exports.webhookCheckout=asyncHandler(async (req, res, next)=>{
+  const sig=req.headers['stripe-signature'];
+
+  let event;
+
+  try{
+    event = stripe.webhooks.constructEvent(req,res,sig,process.env.STRIPE_WEBHOOK_SECRET);
+  }catch(err){
+    return res.status(400).send(`Webhook Error : ${err.message}`);
+  }
+
+  if(event.type ==='checkout.session.completed'){
+    console.log('Create Order Here............')
+  }
+})
