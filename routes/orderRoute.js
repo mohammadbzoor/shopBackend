@@ -1,40 +1,44 @@
 const express = require('express');
-// const {
-//     getBrandValidator,
-//     createBrandValidator,
-//     updateBrandValidator,
-//     deleteBrandValidator
-// }= require('../utils/validators/BrandValidator')
 const {
-    createCashOrder,
-    filterOrderForLoggedUser,
-    findAllOrders,
-    findSpecificOrder,
-    updateOrderToDelivered,
-    updateOrderToPaid,
-    checkoutSession
-
+  createCashOrder,
+  findAllOrders,
+  findSpecificOrder,
+  filterOrderForLoggedUser,
+  updateOrderToPaid,
+  updateOrderToDelivered,
+  checkoutSession,
 } = require('../services/orderServices');
 
-const authService= require("../services/authService")
+const authService = require('../services/authService');
 
 const router = express.Router();
 
-router.use(authService.protect)
+router.use(authService.protect);
 
-router.route('/checkout-session/:cartId').get(authService.allowedTo('user'),checkoutSession)
+router.get(
+  '/checkout-session/:cartId',
+  authService.allowedTo('user'),
+  checkoutSession
+);
 
-router.route('/').get(authService.allowedTo('user','admin','manager'),filterOrderForLoggedUser,findAllOrders)
-router.route('/:cartId')
-.post(authService.allowedTo('user'),createCashOrder)
+router.route('/:cartId').post(authService.allowedTo('user'), createCashOrder);
+router.get(
+  '/',
+  authService.allowedTo('user', 'admin', 'manager'),
+  filterOrderForLoggedUser,
+  findAllOrders
+);
+router.get('/:id', findSpecificOrder);
 
-router.route('/:id').get(authService.allowedTo('user'),findSpecificOrder)
-
-router.route('/:id/pay').put(authService.allowedTo('admin','manager'),updateOrderToPaid)
-router.route('/:id/deliver').put(authService.allowedTo('admin','manager'),updateOrderToDelivered)
-
-
-
-
+router.put(
+  '/:id/pay',
+  authService.allowedTo('admin', 'manager'),
+  updateOrderToPaid
+);
+router.put(
+  '/:id/deliver',
+  authService.allowedTo('admin', 'manager'),
+  updateOrderToDelivered
+);
 
 module.exports = router;
