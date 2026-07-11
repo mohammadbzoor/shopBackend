@@ -193,7 +193,7 @@ const createCardOrder = async (session) => {
     totalOrderPrice: orderPrice,
     isPaid: true,
     paidAt: Date.now(),
-    paymentMethodType: 'card',
+    pamentMethodType: 'card',
   });
 
   if (order) {
