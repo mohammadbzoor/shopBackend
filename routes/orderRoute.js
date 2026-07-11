@@ -9,8 +9,8 @@ const {
     createCashOrder,
     filterOrderForLoggedUser,
     findAllOrders,
-    findSpecifcOrder,
-    updateOrderDeli,
+    findSpecificOrder,
+    updateOrderToDelivered,
     updateOrderToPaid,
     checkoutSession
 
@@ -28,10 +28,10 @@ router.route('/').get(authService.allowedTo('user','admin','manager'),filterOrde
 router.route('/:cartId')
 .post(authService.allowedTo('user'),createCashOrder)
 
-router.route('/:id').get(authService.allowedTo('user'),findSpecifcOrder)
+router.route('/:id').get(authService.allowedTo('user'),findSpecificOrder)
 
 router.route('/:id/pay').put(authService.allowedTo('admin','manager'),updateOrderToPaid)
-router.route('/:id/deliver').put(authService.allowedTo('admin','manager'),updateOrderDeli)
+router.route('/:id/deliver').put(authService.allowedTo('admin','manager'),updateOrderToDelivered)
 
 
 
