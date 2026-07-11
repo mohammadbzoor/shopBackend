@@ -168,12 +168,24 @@ line_items: [
 const createCardOrder = async (session) => {
   const cartId = session.client_reference_id;
   const shippingAddress = session.metadata;
-  const orderPrice= session.amount_total / 100;
+  const orderPrice = session.amount_total / 100;
 
   const cart = await Cart.findById(cartId);
-  const user = await User.findOne({ email: session.customer_email });
 
-  // 3) Create order with default paymentMethodType card
+  if (!cart) {
+    throw new Error(`Cart not found with id: ${cartId}`);
+  }
+
+  const user = await User.findOne({
+    email: session.customer_email,
+  });
+
+  if (!user) {
+    throw new Error(
+      `User not found with email: ${session.customer_email}`
+    );
+  }
+
   const order = await Order.create({
     user: user._id,
     cartItems: cart.cartItems,
@@ -184,21 +196,24 @@ const createCardOrder = async (session) => {
     paymentMethodType: 'card',
   });
 
-  // 4) After creating order, decrement product quantity, increment product sold
   if (order) {
     const bulkOption = cart.cartItems.map((item) => ({
       updateOne: {
         filter: { _id: item.product },
-        update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+        update: {
+          $inc: {
+            quantity: -item.quantity,
+            sold: item.quantity,
+          },
+        },
       },
     }));
+
     await Product.bulkWrite(bulkOption, {});
 
-    // 5) Clear cart depend on cartId
     await Cart.findByIdAndDelete(cartId);
   }
 };
-
 // @desc    This webhook will run when stripe payment success paid
 // @route   POST /webhook-checkout
 // @access  Protected/User
