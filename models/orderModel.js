@@ -37,7 +37,6 @@ const orderSchema = new mongoose.Schema({
    pamentMethodType:{
     type:String,
     enum:['card','cash'],
-    default:'cash'
    },
    isPaid:{
     type:Boolean,
